@@ -1,4 +1,4 @@
-package com.potsofsmiles
+package com.potsof.smiles
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

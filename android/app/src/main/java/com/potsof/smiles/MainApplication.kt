@@ -1,4 +1,4 @@
-package com.potsofsmiles
+package com.potsof.smiles
 
 import android.app.Application
 import com.facebook.react.PackageList
