@@ -12,6 +12,7 @@ import {
   Easing,
   useWindowDimensions,
   Alert,
+  LayoutChangeEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -47,6 +48,7 @@ export default function SavedScreen() {
   const [screenStep, setScreenStep] = useState<ScreenStep>('empty');
   const [savedStories, setSavedStories] = useState<SavedStoryItem[]>([]);
   const [selectedStory, setSelectedStory] = useState<SavedStoryItem | null>(null);
+  const [titleTextWidth, setTitleTextWidth] = useState(0);
 
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.94)).current;
@@ -54,11 +56,16 @@ export default function SavedScreen() {
   const contentOpacity = useRef(new Animated.Value(0)).current;
   const contentTranslateY = useRef(new Animated.Value(22)).current;
 
+  const titleText = 'Saved';
+  const titleFontSize = isVerySmallScreen ? 18 : isSmallScreen ? 19 : 20;
+
   const titleFrameWidth = useMemo(() => {
-    if (width < 340) return 230;
-    if (width < 390) return 250;
-    return 278;
-  }, [width]);
+    const horizontalFrameInset = 20;
+    const minWidth = width < 340 ? 150 : width < 390 ? 165 : 180;
+    const maxWidth = Math.min(width - 40, 320);
+    const calculatedWidth = Math.ceil(titleTextWidth) + horizontalFrameInset;
+    return Math.max(minWidth, Math.min(maxWidth, calculatedWidth || minWidth));
+  }, [titleTextWidth, width]);
 
   const titleFrameHeight = useMemo(() => {
     if (width < 340) return 70;
@@ -243,6 +250,13 @@ export default function SavedScreen() {
     ]);
   };
 
+  const handleTitleTextLayout = (event: LayoutChangeEvent) => {
+    const measuredWidth = event.nativeEvent.layout.width;
+    if (measuredWidth > 0 && Math.abs(measuredWidth - titleTextWidth) > 1) {
+      setTitleTextWidth(measuredWidth);
+    }
+  };
+
   return (
     <ImageBackground source={SAVED_BG_UNIQUE_V1} style={styles.bg} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
@@ -277,18 +291,20 @@ export default function SavedScreen() {
             >
               <Image
                 source={SAVED_TITLE_FRAME_UNIQUE_V1}
-                resizeMode="contain"
+                resizeMode="stretch"
                 style={styles.titleFrame}
               />
               <Text
+                onLayout={handleTitleTextLayout}
+                numberOfLines={1}
                 style={[
                   styles.titleFrameText,
                   {
-                    fontSize: isVerySmallScreen ? 18 : isSmallScreen ? 19 : 20,
+                    fontSize: titleFontSize,
                   },
                 ]}
               >
-                Saved
+                {titleText}
               </Text>
             </View>
 
@@ -615,12 +631,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   titleFrameText: {
-    color: '#FFF7F8',
+    color: '#000000',
     fontWeight: '900',
     textAlign: 'center',
-    textShadowColor: '#3E1365',
-    textShadowOffset: { width: 0, height: 2 },
+    paddingHorizontal: 10,
+    textShadowColor: 'rgba(255,255,255,0.65)',
+    textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
+    transform: [{ translateY: 7 }],
   },
   topButtonsRow: {
     flexDirection: 'row',

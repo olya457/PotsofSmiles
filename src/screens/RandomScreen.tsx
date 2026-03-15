@@ -11,6 +11,7 @@ import {
   Animated,
   Easing,
   useWindowDimensions,
+  LayoutChangeEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -121,6 +122,7 @@ export default function RandomScreen() {
   const [thought, setThought] = useState(() => pickRandom(thoughts));
   const [spark, setSpark] = useState(() => pickRandom(sparks));
   const [completed, setCompleted] = useState(false);
+  const [titleTextWidth, setTitleTextWidth] = useState(0);
 
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.94)).current;
@@ -128,11 +130,16 @@ export default function RandomScreen() {
   const contentOpacity = useRef(new Animated.Value(0)).current;
   const contentTranslateY = useRef(new Animated.Value(22)).current;
 
+  const titleText = 'Random Spark';
+  const titleFontSize = isVerySmallScreen ? 17 : isSmallScreen ? 18 : 20;
+
   const titleFrameWidth = useMemo(() => {
-    if (width < 340) return 228;
-    if (width < 390) return 248;
-    return 278;
-  }, [width]);
+    const horizontalFrameInset = 20;
+    const minWidth = width < 340 ? 210 : width < 390 ? 230 : 250;
+    const maxWidth = Math.min(width - 40, 340);
+    const calculatedWidth = Math.ceil(titleTextWidth) + horizontalFrameInset;
+    return Math.max(minWidth, Math.min(maxWidth, calculatedWidth || minWidth));
+  }, [titleTextWidth, width]);
 
   const titleFrameHeight = useMemo(() => {
     if (width < 340) return 66;
@@ -285,6 +292,13 @@ export default function RandomScreen() {
     } catch {}
   };
 
+  const handleTitleTextLayout = (event: LayoutChangeEvent) => {
+    const measuredWidth = event.nativeEvent.layout.width;
+    if (measuredWidth > 0 && Math.abs(measuredWidth - titleTextWidth) > 1) {
+      setTitleTextWidth(measuredWidth);
+    }
+  };
+
   return (
     <ImageBackground source={RANDOM_BG_UNIQUE_V1} style={styles.bg} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
@@ -319,18 +333,20 @@ export default function RandomScreen() {
             >
               <Image
                 source={RANDOM_TITLE_FRAME_UNIQUE_V1}
-                resizeMode="contain"
+                resizeMode="stretch"
                 style={styles.titleFrame}
               />
               <Text
+                onLayout={handleTitleTextLayout}
+                numberOfLines={1}
                 style={[
                   styles.titleFrameText,
                   {
-                    fontSize: isVerySmallScreen ? 17 : isSmallScreen ? 18 : 20,
+                    fontSize: titleFontSize,
                   },
                 ]}
               >
-                Random Spark
+                {titleText}
               </Text>
             </View>
 
@@ -778,12 +794,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   titleFrameText: {
-    color: '#FFF7F8',
+    color: '#000000',
     fontWeight: '900',
     textAlign: 'center',
-    textShadowColor: '#3E1365',
-    textShadowOffset: { width: 0, height: 2 },
+    paddingHorizontal: 10,
+    textShadowColor: 'rgba(255,255,255,0.65)',
+    textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
+    transform: [{ translateY: 7 }],
   },
   exitTopWrap: {
     width: '100%',
@@ -811,11 +829,11 @@ const styles = StyleSheet.create({
   },
   sparkImage: {},
   sectionTitle: {
-    color: '#F8F3E3',
-    fontWeight: '800',
+    color: '#FFF7F0',
+    fontWeight: '900',
     textAlign: 'center',
-    textShadowColor: '#3E1365',
-    textShadowOffset: { width: 0, height: 2 },
+    textShadowColor: '#5A2E00',
+    textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 1,
   },
   infoCard: {
@@ -829,11 +847,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   sectionHeader: {
-    color: '#F8F3E3',
-    fontWeight: '800',
+    color: '#FFF7F0',
+    fontWeight: '900',
     textAlign: 'center',
-    textShadowColor: '#3E1365',
-    textShadowOffset: { width: 0, height: 2 },
+    textShadowColor: '#5A2E00',
+    textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 1,
   },
   thoughtCard: {

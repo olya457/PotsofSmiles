@@ -12,6 +12,7 @@ import {
   Easing,
   useWindowDimensions,
   Alert,
+  LayoutChangeEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -57,6 +58,7 @@ export default function MoodScreen() {
   const [selectedMoodId, setSelectedMoodId] = useState<MoodId | null>(null);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState<number | null>(null);
   const [savedStoryIds, setSavedStoryIds] = useState<string[]>([]);
+  const [titleTextWidth, setTitleTextWidth] = useState(0);
 
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.94)).current;
@@ -80,11 +82,21 @@ export default function MoodScreen() {
 
   const isCurrentStorySaved = selectedStoryId ? savedStoryIds.includes(selectedStoryId) : false;
 
+  const titleText = useMemo(() => {
+    if (screenStep === 'grid') return 'Mood Pick';
+    if (screenStep === 'list') return selectedMood?.title ?? 'Mood Pick';
+    return selectedMood?.title ?? 'Mood Pick';
+  }, [screenStep, selectedMood]);
+
+  const titleFontSize = isVerySmallScreen ? 18 : isSmallScreen ? 19 : 20;
+
   const titleFrameWidth = useMemo(() => {
-    if (width < 340) return 230;
-    if (width < 390) return 250;
-    return 278;
-  }, [width]);
+    const horizontalFrameInset = 20;
+    const minWidth = width < 340 ? 170 : width < 390 ? 190 : 210;
+    const maxWidth = Math.min(width - 40, 340);
+    const calculatedWidth = Math.ceil(titleTextWidth) + horizontalFrameInset;
+    return Math.max(minWidth, Math.min(maxWidth, calculatedWidth || minWidth));
+  }, [titleTextWidth, width]);
 
   const titleFrameHeight = useMemo(() => {
     if (width < 340) return 70;
@@ -291,6 +303,13 @@ export default function MoodScreen() {
     }
   };
 
+  const handleTitleTextLayout = (event: LayoutChangeEvent) => {
+    const measuredWidth = event.nativeEvent.layout.width;
+    if (measuredWidth > 0 && Math.abs(measuredWidth - titleTextWidth) > 1) {
+      setTitleTextWidth(measuredWidth);
+    }
+  };
+
   return (
     <ImageBackground source={MOOD_BG_UNIQUE_V1} style={styles.bg} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
@@ -325,22 +344,20 @@ export default function MoodScreen() {
             >
               <Image
                 source={MOOD_TITLE_FRAME_UNIQUE_V1}
-                resizeMode="contain"
+                resizeMode="stretch"
                 style={styles.titleFrame}
               />
               <Text
+                onLayout={handleTitleTextLayout}
+                numberOfLines={1}
                 style={[
                   styles.titleFrameText,
                   {
-                    fontSize: isVerySmallScreen ? 18 : isSmallScreen ? 19 : 20,
+                    fontSize: titleFontSize,
                   },
                 ]}
               >
-                {screenStep === 'grid'
-                  ? 'Mood Pick'
-                  : screenStep === 'list'
-                  ? selectedMood?.title ?? 'Mood Pick'
-                  : selectedMood?.title ?? 'Mood Pick'}
+                {titleText}
               </Text>
             </View>
 
@@ -652,12 +669,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   titleFrameText: {
-    color: '#FFF7F8',
+    color: '#000000',
     fontWeight: '900',
     textAlign: 'center',
-    textShadowColor: '#3E1365',
-    textShadowOffset: { width: 0, height: 2 },
+    paddingHorizontal: 10,
+    textShadowColor: 'rgba(255,255,255,0.65)',
+    textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
+    transform: [{ translateY: 7 }],
   },
   exitTopWrap: {
     width: '100%',

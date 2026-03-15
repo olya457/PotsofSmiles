@@ -32,40 +32,40 @@ const INTRO_CARD_IMAGE_GUIDE_UNIQUE_V1 = require('../assets/intro_card_image_gui
 
 const introData: IntroItem[] = [
   {
-    id: 'intro-world-unique-v1',
+    id: 'intro-world-fruit-v1',
     image: INTRO_CARD_IMAGE_WORLD_UNIQUE_V1,
-    title: 'A Small World\nof Bright Moments',
-    description: 'Every day holds a tiny spark of adventure.',
+    title: 'A Bright Fruity\nWorld',
+    description: 'Every day brings a fresh and juicy discovery.',
   },
   {
-    id: 'intro-spark-unique-v1',
+    id: 'intro-spark-fruit-v1',
     image: INTRO_CARD_IMAGE_SPARK_UNIQUE_V1,
-    title: 'Spin the Random Spark',
-    description: 'Press the magic button and receive a small quest for today.',
+    title: 'Spin the\nJuicy Spark',
+    description: 'Press the fruit button and receive a small daily quest.',
   },
   {
-    id: 'intro-book-unique-v1',
+    id: 'intro-book-fruit-v1',
     image: INTRO_CARD_IMAGE_BOOK_UNIQUE_V1,
-    title: 'Stories for Every Mood',
-    description: 'Choose your mood and discover a short tale waiting just for you.',
+    title: 'Stories for\nEvery Mood',
+    description: 'Choose your mood and unlock a fruity mini story.',
   },
   {
-    id: 'intro-quiz-unique-v1',
+    id: 'intro-quiz-fruit-v1',
     image: INTRO_CARD_IMAGE_QUIZ_UNIQUE_V1,
-    title: 'A Curious Quiz Awaits',
-    description: 'Little questions, surprising answers, and fun discoveries.',
+    title: 'A Curious\nFruit Quiz',
+    description: 'Little questions, playful answers, and sweet discoveries.',
   },
   {
-    id: 'intro-match-unique-v1',
+    id: 'intro-match-fruit-v1',
     image: INTRO_CARD_IMAGE_MATCH_UNIQUE_V1,
-    title: 'Find the Hidden Emotions',
-    description: 'Flip the cards and match the smiling faces hidden beneath.',
+    title: 'Find the Hidden\nFruits',
+    description: 'Flip the cards and match cheerful fruit faces.',
   },
   {
-    id: 'intro-guide-unique-v1',
+    id: 'intro-guide-fruit-v1',
     image: INTRO_CARD_IMAGE_GUIDE_UNIQUE_V1,
-    title: 'Meet the Cheerful Guide',
-    description: 'A cheerful helper is here to lead you through this little world of wonders.',
+    title: 'Meet the\nJuicy Guide',
+    description: 'A friendly fruit character is here to brighten your day.',
   },
 ];
 

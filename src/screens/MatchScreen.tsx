@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,11 +9,11 @@ import {
   Animated,
   Easing,
   useWindowDimensions,
+  LayoutChangeEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { MainTabParamList, RootStackParamList } from '../navigation/types';
 
@@ -32,17 +32,24 @@ export default function MatchScreen({ navigation }: Props) {
   const isSmallScreen = height < 760 || width < 360;
   const isVerySmallScreen = height < 700 || width < 340;
 
+  const [titleTextWidth, setTitleTextWidth] = useState(0);
+
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.94)).current;
   const translateY = useRef(new Animated.Value(18)).current;
   const contentOpacity = useRef(new Animated.Value(0)).current;
   const contentTranslateY = useRef(new Animated.Value(22)).current;
 
+  const titleText = 'Emotion Match';
+  const titleFontSize = isVerySmallScreen ? 16 : isSmallScreen ? 17 : 18;
+
   const titleFrameWidth = useMemo(() => {
-    if (width < 340) return 220;
-    if (width < 390) return 245;
-    return 270;
-  }, [width]);
+    const horizontalFrameInset = 20;
+    const minWidth = width < 340 ? 200 : width < 390 ? 220 : 240;
+    const maxWidth = Math.min(width - 40, 340);
+    const calculatedWidth = Math.ceil(titleTextWidth) + horizontalFrameInset;
+    return Math.max(minWidth, Math.min(maxWidth, calculatedWidth || minWidth));
+  }, [titleTextWidth, width]);
 
   const titleFrameHeight = useMemo(() => {
     if (width < 340) return 66;
@@ -112,6 +119,13 @@ export default function MatchScreen({ navigation }: Props) {
     navigation.navigate('MatchPlay');
   };
 
+  const handleTitleTextLayout = (event: LayoutChangeEvent) => {
+    const measuredWidth = event.nativeEvent.layout.width;
+    if (measuredWidth > 0 && Math.abs(measuredWidth - titleTextWidth) > 1) {
+      setTitleTextWidth(measuredWidth);
+    }
+  };
+
   return (
     <ImageBackground source={MATCH_BG_UNIQUE_V1} style={styles.bg} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
@@ -135,18 +149,20 @@ export default function MatchScreen({ navigation }: Props) {
           >
             <Image
               source={MATCH_TITLE_FRAME_UNIQUE_V1}
-              resizeMode="contain"
+              resizeMode="stretch"
               style={styles.titleFrame}
             />
             <Text
+              onLayout={handleTitleTextLayout}
+              numberOfLines={1}
               style={[
                 styles.titleFrameText,
                 {
-                  fontSize: isVerySmallScreen ? 16 : isSmallScreen ? 17 : 18,
+                  fontSize: titleFontSize,
                 },
               ]}
             >
-              Emotion Match
+              {titleText}
             </Text>
           </View>
 
@@ -228,12 +244,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   titleFrameText: {
-    color: '#FFF7F8',
+    color: '#000000',
     fontWeight: '900',
     textAlign: 'center',
-    textShadowColor: '#3E1365',
-    textShadowOffset: { width: 0, height: 2 },
+    paddingHorizontal: 10,
+    textShadowColor: 'rgba(255,255,255,0.65)',
+    textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
+    transform: [{ translateY: 7 }],
   },
   introText: {
     color: '#F6F0FF',
